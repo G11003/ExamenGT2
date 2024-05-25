@@ -85,6 +85,25 @@ const playerBubble = {
 const playerImage = loadImage(colorMap[randomColor]);
 
 
+canvas.addEventListener('mousemove', function(event) {
+  const rect = canvas.getBoundingClientRect();
+  playerBubble.x = event.clientX - rect.left;
+  playerBubble.y = event.clientY - rect.top;
+});
+
+function update() {
+
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  update();
+  draw();
+}
+
+loop();
+
+
 function drawPlayer() {
   context.drawImage(playerImage, playerBubble.x - playerBubble.radius, playerBubble.y - playerBubble.radius, playerBubble.radius * 2, playerBubble.radius * 2);
 }
