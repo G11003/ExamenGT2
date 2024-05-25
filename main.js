@@ -74,3 +74,34 @@ for (let row = 0; row < level1.length; row++) {
     createBubble(startX + col * (grid + bubbleGap+3), row * (grid + bubbleGap), color);
   }
 }
+const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
+const playerBubble = {
+  x: canvas.width / 2,
+  y: canvas.height - grid +5 / 2,
+  radius: grid / 2 * bubbleRadiusFactor,
+  color: randomColor
+};
+
+const playerImage = loadImage(colorMap[randomColor]);
+
+
+function drawPlayer() {
+  context.drawImage(playerImage, playerBubble.x - playerBubble.radius, playerBubble.y - playerBubble.radius, playerBubble.radius * 2, playerBubble.radius * 2);
+}
+
+function draw() {
+  drawBubbles();
+  drawPlayer();
+}
+
+function update() {
+  // Lógica de actualización del juego
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  update();
+  draw();
+}
+
+loop();
