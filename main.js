@@ -2,7 +2,7 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
 const grid = 32;
-const bubbleGap = 4;
+const bubbleGap = 9;
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
   ['1','1','2','2','3','3','4','4'],
@@ -47,7 +47,7 @@ function createBubble(x, y, color) {
   const center = grid / 2;
 
   bubbles.push({
-    x: x + startX + center,
+    x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
     y: y + center + 7, 
     radius: grid / 2 * bubbleRadiusFactor, // Aumentamos el radio de la burbuja
     color: color,
@@ -71,6 +71,6 @@ const startX = (canvas.width - totalWidth) / 2;
 for (let row = 0; row < level1.length; row++) {
   for (let col = 0; col < level1[row].length; col++) {
     const color = level1[row][col];
-    createBubble(startX + col * (grid + bubbleGap+8), row * (grid + bubbleGap+8), color);
+    createBubble(startX + col * (grid + bubbleGap+3), row * (grid + bubbleGap), color);
   }
 }
