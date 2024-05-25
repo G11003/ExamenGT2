@@ -84,25 +84,46 @@ const playerBubble = {
 
 const playerImage = loadImage(colorMap[randomColor]);
 
+let shootDeg = 0;
+const minDeg = -Math.PI / 3;
+const maxDeg = Math.PI / 3;
+let shootDir = 0;
 
-canvas.addEventListener('mousemove', function(event) {
+function updatePlayerPosition(event) {
   const rect = canvas.getBoundingClientRect();
-  playerBubble.x = event.clientX - rect.left;
-  playerBubble.y = event.clientY - rect.top;
-});
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
 
-function update() {
+  // Calcular el ángulo de dirección del cañón
+  const dx = mouseX - playerBubble.x;
+  const dy = mouseY - playerBubble.y;
+  shootDeg = Math.atan2(dy, dx);
 
+  // Limitar el ángulo de dirección del cañón
+  shootDeg = Math.max(minDeg, Math.min(maxDeg, shootDeg));
 }
 
-function loop() {
-  requestAnimationFrame(loop);
-  update();
-  draw();
+canvas.addEventListener('mousemove', updatePlayerPosition);
+
+function drawArrow() {
+  context.save();
+  context.translate(playerBubble.x, playerBubble.y);
+  context.rotate(shootDeg);
+  context.translate(0, -playerBubble.radius * 2);
+
+  context.strokeStyle = 'white';
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(0, 0);
+  context.lineTo(0, -playerBubble.radius * 4);
+  context.moveTo(0, 0);
+  context.lineTo(-10, -playerBubble.radius * 0.8);
+  context.moveTo(0, 0);
+  context.lineTo(10, -playerBubble.radius * 0.8);
+  context.stroke();
+
+  context.restore();
 }
-
-loop();
-
 
 function drawPlayer() {
   context.drawImage(playerImage, playerBubble.x - playerBubble.radius, playerBubble.y - playerBubble.radius, playerBubble.radius * 2, playerBubble.radius * 2);
@@ -111,6 +132,7 @@ function drawPlayer() {
 function draw() {
   drawBubbles();
   drawPlayer();
+  drawArrow(); // Dibujar la flecha indicadora de dirección del cañón
 }
 
 function update() {
