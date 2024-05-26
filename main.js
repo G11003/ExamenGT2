@@ -84,23 +84,13 @@ const playerBubble = {
 
 const playerImage = loadImage(colorMap[randomColor]);
 
-let shootDeg = -Math.PI / 2; // Apuntar hacia arriba
-const minDeg = -Math.PI / 3;
-const maxDeg = Math.PI / 3;
-let shootDir = 0;
+let mouseX = 0;
+let mouseY = 0;
 
 function updatePlayerPosition(event) {
   const rect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  const mouseY = event.clientY - rect.top;
-
-  // Calcular el ángulo de dirección del cañón
-  const dx = mouseX - playerBubble.x;
-  const dy = mouseY - playerBubble.y;
-  shootDeg = Math.atan2(dy, dx);
-
-  // Limitar el ángulo de dirección del cañón
-  shootDeg = Math.max(minDeg, Math.min(maxDeg, shootDeg));
+  mouseX = event.clientX - rect.left;
+  mouseY = event.clientY - rect.top;
 }
 
 canvas.addEventListener('mousemove', updatePlayerPosition);
@@ -108,12 +98,19 @@ canvas.addEventListener('mousemove', updatePlayerPosition);
 function drawArrow() {
   context.save();
   context.translate(playerBubble.x, playerBubble.y);
-  context.rotate(shootDeg); 
-  const arrowLength = 30; // Longitud de la flecha
-  const arrowWidth = 5; // Ancho de la flecha
+  
+  // Ajustar el ángulo de rotación en 90 grados
+  const dx = mouseX - playerBubble.x;
+  const dy = mouseY - playerBubble.y;
+  const shootDeg = Math.atan2(dy, dx);
+  const adjustedAngle = shootDeg + Math.PI / 2;
+  context.rotate(adjustedAngle); 
+  
+  const arrowLength = 40; 
+  const arrowWidth = 5; 
 
-  const startX = 0; // Comienza en el mismo punto que la pelotita
-  const startY = -playerBubble.radius * bubbleRadiusFactor; // Va hacia arriba desde la pelotita
+  const startX = 0; 
+  const startY = -playerBubble.radius * bubbleRadiusFactor; 
 
   context.translate(startX, startY);
 
@@ -121,11 +118,11 @@ function drawArrow() {
   context.lineWidth = 2;
   context.beginPath();
   context.moveTo(0, 0); 
-  context.lineTo(0, -arrowLength); // Línea central de la flecha (hacia arriba)
-  context.moveTo(0, -arrowLength); // Mueve el punto de inicio a la punta de la flecha
-  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth); // Línea izquierda de la flecha
-  context.moveTo(0, -arrowLength); // Mueve el punto de inicio a la punta de la flecha
-  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth); // Línea derecha de la flecha
+  context.lineTo(0, -arrowLength);
+  context.moveTo(0, -arrowLength);
+  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth); 
+  context.moveTo(0, -arrowLength); 
+  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth); 
   context.stroke();
 
   context.restore();
@@ -139,7 +136,7 @@ function drawPlayer() {
 function draw() {
   drawBubbles();
   drawPlayer();
-  drawArrow(); // Dibujar la flecha indicadora de dirección del cañón
+  drawArrow(); 
 }
 
 function update() {
