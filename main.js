@@ -17,13 +17,13 @@ canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
 const grid = 32;
-const bubbleGap = 3;
+const bubbleGap = 9;
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4'],
-  ['2', '3', '3', '1', '1', '2', '2', '1', '2'],
-  ['2', '1', '2', '2', '4', '1', '3', '3'],
-  ['1', '3', '3', '1', '4', '1', '4', '2', '2']
+  ['1','1','2','2','3','3','4','4'],
+  ['2','3','3','1','1','2','2','1','2'],
+  ['2','1','2','2','4','1','3','3'],
+  ['1','3','3','1','4','1','4','2','2']
 ];
 
 const colorMap = {
@@ -66,12 +66,10 @@ function createBubble(x, y, color) {
 
   bubbles.push({
     x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
-    y: y + center + 7,
+    y: y + center + 7, 
     radius: grid / 2 * bubbleRadiusFactor, // Aumentamos el radio de la burbuja
     color: color,
-    active: color ? true : false,
-    row: row,
-    col: col
+    active: color ? true : false
   });
 }
 
@@ -91,14 +89,13 @@ const startX = (realCanvasWidth - totalWidth) / 2 + margin; // Ajustar el inicio
 for (let row = 0; row < level1.length; row++) {
   for (let col = 0; col < level1[row].length; col++) {
     const color = level1[row][col];
-    createBubble(startX + col * (grid + bubbleGap + 1), row * (grid + bubbleGap), color);
+    createBubble(startX + col * (grid + bubbleGap+3), row * (grid + bubbleGap), color);
   }
 }
-
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
   x: realCanvasWidth / 2 + margin, // Ajustar la posición inicial con el margen
-  y: realCanvasHeight - grid + 5 / 2,
+  y: realCanvasHeight - grid +5 / 2,
   radius: grid / 2 * bubbleRadiusFactor,
   color: randomColor
 };
@@ -119,31 +116,31 @@ canvas.addEventListener('mousemove', updatePlayerPosition);
 function drawArrow() {
   context.save();
   context.translate(playerBubble.x, playerBubble.y);
-
+  
   // Ajustar el ángulo de rotación en 90 grados
   const dx = mouseX - playerBubble.x;
   const dy = mouseY - playerBubble.y;
   const shootDeg = Math.atan2(dy, dx);
   const adjustedAngle = shootDeg + Math.PI / 2;
-  context.rotate(adjustedAngle);
+  context.rotate(adjustedAngle); 
+  
+  const arrowLength = 40; 
+  const arrowWidth = 5; 
 
-  const arrowLength = 40;
-  const arrowWidth = 5;
-
-  const startX = 0;
-  const startY = -playerBubble.radius * bubbleRadiusFactor;
+  const startX = 0; 
+  const startY = -playerBubble.radius * bubbleRadiusFactor; 
 
   context.translate(startX, startY);
 
   context.strokeStyle = 'white';
   context.lineWidth = 2;
   context.beginPath();
-  context.moveTo(0, 0);
+  context.moveTo(0, 0); 
   context.lineTo(0, -arrowLength);
   context.moveTo(0, -arrowLength);
-  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth);
-  context.moveTo(0, -arrowLength);
-  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth);
+  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth); 
+  context.moveTo(0, -arrowLength); 
+  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth); 
   context.stroke();
 
   context.restore();
@@ -156,8 +153,8 @@ function drawPlayer() {
 function draw() {
   drawBubbles();
   drawPlayer();
-  drawArrow();
-
+  drawArrow(); 
+  
   // Dibujar la burbuja disparada
   if (isShooting && shotBubble) {
     const img = images[shotBubble.color];
@@ -166,7 +163,7 @@ function draw() {
 
   // Ocultar el puntero del mouse predeterminado
   canvas.style.cursor = 'none';
-
+  
   // Dibujar el puntero personalizado en la posición del mouse
   context.drawImage(customPointer, mouseX - 5, mouseY - 5, 55, 55); // Establece el tamaño a 10px
 }
@@ -176,7 +173,6 @@ let shotBubble = null;
 let shotAngle = 0;
 
 canvas.addEventListener('click', shootBubble);
-let isFirstShot = true; // Variable para rastrear el primer disparo
 
 function shootBubble() {
   if (!isShooting) {
@@ -184,24 +180,16 @@ function shootBubble() {
     const dx = mouseX - playerBubble.x;
     const dy = mouseY - playerBubble.y;
     shotAngle = Math.atan2(dy, dx);
-    
-    // Ajuste de las velocidades basado en si es el primer disparo o no
-    const shotSpeed = isFirstShot ? 7 : 7;
-    
     shotBubble = {
       x: playerBubble.x,
       y: playerBubble.y,
       radius: playerBubble.radius,
       color: playerBubble.color,
-      vx: Math.cos(shotAngle) * shotSpeed,
-      vy: Math.sin(shotAngle) * shotSpeed
+      vx: Math.cos(shotAngle) * 5,
+      vy: Math.sin(shotAngle) * 5
     };
-    
-    // Después del primer disparo, ya no es el primero
-    isFirstShot = false;
   }
 }
-
 
 function update() {
   if (isShooting && shotBubble) {
@@ -222,10 +210,7 @@ function update() {
       if (bubble.active && detectCollision(shotBubble, bubble)) {
         isShooting = false;
         shotBubble.active = true;
-        shotBubble.row = bubble.row;
-        shotBubble.col = bubble.col;
         bubbles.push(shotBubble);
-        checkAndPopBubbles(shotBubble);
         createNewPlayerBubble();
         break;
       }
@@ -236,7 +221,6 @@ function update() {
       isShooting = false;
       shotBubble.active = true;
       bubbles.push(shotBubble);
-      checkAndPopBubbles(shotBubble);
       createNewPlayerBubble();
     }
   }
@@ -253,177 +237,6 @@ function createNewPlayerBubble() {
   const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
   playerBubble.color = randomColor;
   playerImage.src = 'img/' + colorMap[randomColor];
-}
-
-function checkAndPopBubbles(bubble) {
-  const stack = [bubble];
-  const connectedBubbles = [];
-  const visited = new Set();
-
-  while (stack.length > 0) {
-    const currentBubble = stack.pop();
-    const key = `${currentBubble.row},${currentBubble.col}`;
-    if (visited.has(key)) continue;
-
-    visited.add(key);
-    connectedBubbles.push(currentBubble);
-
-    for (const neighbor of getNeighbors(currentBubble)) {
-      if (neighbor.color === currentBubble.color && !visited.has(`${neighbor.row},${neighbor.col}`)) {
-        stack.push(neighbor);
-      }
-    }
-  }
-
-  if (connectedBubbles.length >= 3) {
-    for (const b of connectedBubbles) {
-      b.active = false;
-    }
-  }
-}
-
-
-function checkAndPopBubbles(bubble) {
-  const stack = [bubble];
-  const connectedBubbles = [];
-  const visited = new Set();
-
-  while (stack.length > 0) {
-    const currentBubble = stack.pop();
-    const key = `${currentBubble.row},${currentBubble.col}`;
-    if (visited.has(key)) continue;
-
-    visited.add(key);
-    connectedBubbles.push(currentBubble);
-
-    for (const neighbor of getNeighbors(currentBubble)) {
-      if (neighbor.color === currentBubble.color) {
-        stack.push(neighbor);
-      }
-    }
-  }
-
-  if (connectedBubbles.length >= 3) {
-    for (const b of connectedBubbles) {
-      b.active = false;
-    }
-  }
-}
-
-function getNeighbors(bubble) {
-  const neighbors = [];
-  const directions = [
-    { dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
-    { dx: 1, dy: 1 }, { dx: -1, dy: -1 },
-    { dx: 1, dy: -1 }, { dx: -1, dy: 1 } // Diagonales adicionales
-  ];
-
-  for (const direction of directions) {
-    const neighborRow = bubble.row + direction.dy;
-    const neighborCol = bubble.col + direction.dx;
-    // Verifica si el vecino está dentro de los límites del canvas
-    if (neighborRow >= 0 && neighborRow < level1.length && neighborCol >= 0 && neighborCol < level1[0].length) {
-      const neighborColor = level1[neighborRow][neighborCol];
-      // Busca la burbuja en base a su posición y tipo
-      const neighbor = bubbles.find(b => b.row === neighborRow && b.col === neighborCol && b.color === neighborColor);
-      if (neighbor && neighbor.active) {
-        neighbors.push(neighbor);
-      }
-    }
-  }
-
-  return neighbors;
-}
-
-function update() {
-  if (isShooting && shotBubble) {
-    shotBubble.x += shotBubble.vx;
-    shotBubble.y += shotBubble.vy;
-
-    // Detectar colisión con los bordes del canvas
-    if (shotBubble.x - shotBubble.radius < margin || shotBubble.x + shotBubble.radius > canvasWidth - margin) {
-      shotBubble.vx *= -1;
-    }
-
-    if (shotBubble.y - shotBubble.radius < 0) {
-      shotBubble.vy *= -1;
-    }
-
-    // Detectar colisión con otras burbujas
-    for (const bubble of bubbles) {
-      if (bubble.active && detectCollision(shotBubble, bubble)) {
-        isShooting = false;
-        shotBubble.active = true;
-        shotBubble.row = bubble.row;
-        shotBubble.col = bubble.col;
-        bubbles.push(shotBubble);
-        checkAndPopBubbles(shotBubble);
-        createNewPlayerBubble();
-        break;
-      }
-    }
-
-    // Si la burbuja llega al borde superior, detener el disparo
-    if (shotBubble.y - shotBubble.radius <= 0) {
-      isShooting = false;
-      shotBubble.active = true;
-      bubbles.push(shotBubble);
-      checkAndPopBubbles(shotBubble);
-      createNewPlayerBubble();
-    }
-  }
-
-  // Verificar si hay burbujas flotantes y hacerlas caer
-  let floatingBubbles = bubbles.filter(bubble => bubble.active && bubble.y - bubble.radius <= 0 && bubble.row > 0);
-  while (floatingBubbles.length > 0) {
-    let falling = false;
-    for (const bubble of floatingBubbles) {
-      const neighbors = getNeighbors(bubble);
-      if (neighbors.length === 0 || neighbors.some(neighbor => !neighbor.active)) {
-        bubble.y += grid;
-        falling = true;
-      }
-    }
-    if (!falling) break;
-    floatingBubbles = bubbles.filter(bubble => bubble.active && bubble.y - bubble.radius <= 0 && bubble.row > 0);
-  }
-}
-function checkAndPopBubbles(bubble) {
-  const stack = [bubble];
-  const connectedBubbles = [];
-  const visited = new Set();
-
-  while (stack.length > 0) {
-    const currentBubble = stack.pop();
-    const key = `${currentBubble.row},${currentBubble.col}`;
-    if (visited.has(key)) continue;
-
-    visited.add(key);
-    connectedBubbles.push(currentBubble);
-
-    for (const neighbor of getNeighbors(currentBubble)) {
-      if (
-        neighbor.color === currentBubble.color &&
-        !visited.has(`${neighbor.row},${neighbor.col}`) &&
-        areConnectedDirectly(currentBubble, neighbor)
-      ) {
-        stack.push(neighbor);
-      }
-    }
-  }
-
-  if (connectedBubbles.length >= 3) {
-    for (const b of connectedBubbles) {
-      b.active = false;
-    }
-  }
-}
-
-function areConnectedDirectly(bubble1, bubble2) {
-  const dx = Math.abs(bubble1.col - bubble2.col);
-  const dy = Math.abs(bubble1.row - bubble2.row);
-  // Burbujas adyacentes horizontal o verticalmente
-  return (dx === 1 && dy === 0) || (dy === 1 && dx === 0);
 }
 
 function loop() {
