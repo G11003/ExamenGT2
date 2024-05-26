@@ -20,10 +20,10 @@ const grid = 32;
 const bubbleGap = 9;
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
-  ['1','1','2','2','3','3','4','4'],
-  ['2','3','3','1','1','2','2','1','2'],
-  ['2','1','2','2','4','1','3','3'],
-  ['1','3','3','1','4','1','4','2','2']
+  ['1', '1', '2', '2', '3', '3', '4', '4'],
+  ['2', '3', '3', '1', '1', '2', '2', '1', '2'],
+  ['2', '1', '2', '2', '4', '1', '3', '3'],
+  ['1', '3', '3', '1', '4', '1', '4', '2', '2']
 ];
 
 const colorMap = {
@@ -66,10 +66,12 @@ function createBubble(x, y, color) {
 
   bubbles.push({
     x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
-    y: y + center + 7, 
+    y: y + center + 7,
     radius: grid / 2 * bubbleRadiusFactor, // Aumentamos el radio de la burbuja
     color: color,
-    active: color ? true : false
+    active: color ? true : false,
+    row: row,
+    col: col
   });
 }
 
@@ -89,13 +91,14 @@ const startX = (realCanvasWidth - totalWidth) / 2 + margin; // Ajustar el inicio
 for (let row = 0; row < level1.length; row++) {
   for (let col = 0; col < level1[row].length; col++) {
     const color = level1[row][col];
-    createBubble(startX + col * (grid + bubbleGap+3), row * (grid + bubbleGap), color);
+    createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
   }
 }
+
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
   x: realCanvasWidth / 2 + margin, // Ajustar la posición inicial con el margen
-  y: realCanvasHeight - grid +5 / 2,
+  y: realCanvasHeight - grid + 5 / 2,
   radius: grid / 2 * bubbleRadiusFactor,
   color: randomColor
 };
@@ -116,31 +119,31 @@ canvas.addEventListener('mousemove', updatePlayerPosition);
 function drawArrow() {
   context.save();
   context.translate(playerBubble.x, playerBubble.y);
-  
+
   // Ajustar el ángulo de rotación en 90 grados
   const dx = mouseX - playerBubble.x;
   const dy = mouseY - playerBubble.y;
   const shootDeg = Math.atan2(dy, dx);
   const adjustedAngle = shootDeg + Math.PI / 2;
-  context.rotate(adjustedAngle); 
-  
-  const arrowLength = 40; 
-  const arrowWidth = 5; 
+  context.rotate(adjustedAngle);
 
-  const startX = 0; 
-  const startY = -playerBubble.radius * bubbleRadiusFactor; 
+  const arrowLength = 40;
+  const arrowWidth = 5;
+
+  const startX = 0;
+  const startY = -playerBubble.radius * bubbleRadiusFactor;
 
   context.translate(startX, startY);
 
   context.strokeStyle = 'white';
   context.lineWidth = 2;
   context.beginPath();
-  context.moveTo(0, 0); 
+  context.moveTo(0, 0);
   context.lineTo(0, -arrowLength);
   context.moveTo(0, -arrowLength);
-  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth); 
-  context.moveTo(0, -arrowLength); 
-  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth); 
+  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth);
+  context.moveTo(0, -arrowLength);
+  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth);
   context.stroke();
 
   context.restore();
@@ -153,8 +156,8 @@ function drawPlayer() {
 function draw() {
   drawBubbles();
   drawPlayer();
-  drawArrow(); 
-  
+  drawArrow();
+
   // Dibujar la burbuja disparada
   if (isShooting && shotBubble) {
     const img = images[shotBubble.color];
@@ -163,7 +166,7 @@ function draw() {
 
   // Ocultar el puntero del mouse predeterminado
   canvas.style.cursor = 'none';
-  
+
   // Dibujar el puntero personalizado en la posición del mouse
   context.drawImage(customPointer, mouseX - 5, mouseY - 5, 55, 55); // Establece el tamaño a 10px
 }
@@ -210,7 +213,10 @@ function update() {
       if (bubble.active && detectCollision(shotBubble, bubble)) {
         isShooting = false;
         shotBubble.active = true;
+        shotBubble.row = bubble.row;
+        shotBubble.col = bubble.col;
         bubbles.push(shotBubble);
+        checkAndPopBubbles(shotBubble);
         createNewPlayerBubble();
         break;
       }
@@ -221,6 +227,7 @@ function update() {
       isShooting = false;
       shotBubble.active = true;
       bubbles.push(shotBubble);
+      checkAndPopBubbles(shotBubble);
       createNewPlayerBubble();
     }
   }
@@ -237,6 +244,52 @@ function createNewPlayerBubble() {
   const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
   playerBubble.color = randomColor;
   playerImage.src = 'img/' + colorMap[randomColor];
+}
+
+function checkAndPopBubbles(bubble) {
+  const stack = [bubble];
+  const connectedBubbles = [];
+  const visited = new Set();
+
+  while (stack.length > 0) {
+    const currentBubble = stack.pop();
+    const key = `${currentBubble.row},${currentBubble.col}`;
+    if (visited.has(key)) continue;
+
+    visited.add(key);
+    connectedBubbles.push(currentBubble);
+
+    for (const neighbor of getNeighbors(currentBubble)) {
+      if (neighbor.color === currentBubble.color) {
+        stack.push(neighbor);
+      }
+    }
+  }
+
+  if (connectedBubbles.length >= 3) {
+    for (const b of connectedBubbles) {
+      b.active = false;
+    }
+  }
+}
+
+function getNeighbors(bubble) {
+  const neighbors = [];
+  const directions = [
+    { dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
+    { dx: 1, dy: 1 }, { dx: -1, dy: -1 }
+  ];
+
+  for (const direction of directions) {
+    const neighborRow = bubble.row + direction.dy;
+    const neighborCol = bubble.col + direction.dx;
+    const neighbor = bubbles.find(b => b.row === neighborRow && b.col === neighborCol);
+    if (neighbor && neighbor.active) {
+      neighbors.push(neighbor);
+    }
+  }
+
+  return neighbors;
 }
 
 function loop() {
