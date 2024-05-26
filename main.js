@@ -1,6 +1,21 @@
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
+// Tamaño del canvas con margen
+const canvasWidth = 800;
+const canvasHeight = 600;
+
+// Margen añadido al canvas
+const margin = 50;
+
+// Tamaño del canvas real (sin margen)
+const realCanvasWidth = canvasWidth - 2 * margin;
+const realCanvasHeight = canvasHeight;
+
+// Ajustar el tamaño del canvas para incluir el margen
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
+
 const grid = 32;
 const bubbleGap = 9;
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
@@ -39,6 +54,9 @@ for (const color in colorMap) {
   images[color] = loadImage(colorMap[color]);
 }
 
+// Cargar la imagen del puntero personalizado
+const customPointer = loadImage('punto.png');
+
 function createBubble(x, y, color) {
   const row = Math.floor(y / grid);
   const col = Math.floor(x / grid);
@@ -66,7 +84,7 @@ function drawBubbles() {
 }
 
 const totalWidth = level1[0].length * (grid + bubbleGap);
-const startX = (canvas.width - totalWidth) / 2;
+const startX = (realCanvasWidth - totalWidth) / 2 + margin; // Ajustar el inicio con el margen
 
 for (let row = 0; row < level1.length; row++) {
   for (let col = 0; col < level1[row].length; col++) {
@@ -76,8 +94,8 @@ for (let row = 0; row < level1.length; row++) {
 }
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
-  x: canvas.width / 2,
-  y: canvas.height - grid +5 / 2,
+  x: realCanvasWidth / 2 + margin, // Ajustar la posición inicial con el margen
+  y: realCanvasHeight - grid +5 / 2,
   radius: grid / 2 * bubbleRadiusFactor,
   color: randomColor
 };
@@ -89,8 +107,8 @@ let mouseY = 0;
 
 function updatePlayerPosition(event) {
   const rect = canvas.getBoundingClientRect();
-  mouseX = event.clientX - rect.left;
-  mouseY = event.clientY - rect.top;
+  mouseX = Math.max(margin, Math.min(event.clientX - rect.left - margin, realCanvasWidth)); // Ajustar la posición del mouse con el margen
+  mouseY = Math.max(0, Math.min(event.clientY - rect.top, realCanvasHeight));
 }
 
 canvas.addEventListener('mousemove', updatePlayerPosition);
@@ -128,7 +146,6 @@ function drawArrow() {
   context.restore();
 }
 
-
 function drawPlayer() {
   context.drawImage(playerImage, playerBubble.x - playerBubble.radius, playerBubble.y - playerBubble.radius, playerBubble.radius * 2, playerBubble.radius * 2);
 }
@@ -137,6 +154,12 @@ function draw() {
   drawBubbles();
   drawPlayer();
   drawArrow(); 
+  
+  // Ocultar el puntero del mouse predeterminado
+  canvas.style.cursor = 'none';
+  
+  // Dibujar el puntero personalizado en la posición del mouse
+  context.drawImage(customPointer, mouseX - 5, mouseY - 5, 55, 55); // Establece el tamaño a 10px
 }
 
 function update() {
