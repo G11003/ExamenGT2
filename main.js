@@ -155,6 +155,12 @@ function draw() {
   drawPlayer();
   drawArrow(); 
   
+  // Dibujar la burbuja disparada
+  if (isShooting && shotBubble) {
+    const img = images[shotBubble.color];
+    context.drawImage(img, shotBubble.x - shotBubble.radius, shotBubble.y - shotBubble.radius, shotBubble.radius * 2, shotBubble.radius * 2);
+  }
+
   // Ocultar el puntero del mouse predeterminado
   canvas.style.cursor = 'none';
   
@@ -162,8 +168,75 @@ function draw() {
   context.drawImage(customPointer, mouseX - 5, mouseY - 5, 55, 55); // Establece el tamaño a 10px
 }
 
+let isShooting = false;
+let shotBubble = null;
+let shotAngle = 0;
+
+canvas.addEventListener('click', shootBubble);
+
+function shootBubble() {
+  if (!isShooting) {
+    isShooting = true;
+    const dx = mouseX - playerBubble.x;
+    const dy = mouseY - playerBubble.y;
+    shotAngle = Math.atan2(dy, dx);
+    shotBubble = {
+      x: playerBubble.x,
+      y: playerBubble.y,
+      radius: playerBubble.radius,
+      color: playerBubble.color,
+      vx: Math.cos(shotAngle) * 5,
+      vy: Math.sin(shotAngle) * 5
+    };
+  }
+}
+
 function update() {
-  // Lógica de actualización del juego
+  if (isShooting && shotBubble) {
+    shotBubble.x += shotBubble.vx;
+    shotBubble.y += shotBubble.vy;
+
+    // Detectar colisión con los bordes del canvas
+    if (shotBubble.x - shotBubble.radius < margin || shotBubble.x + shotBubble.radius > canvasWidth - margin) {
+      shotBubble.vx *= -1;
+    }
+
+    if (shotBubble.y - shotBubble.radius < 0) {
+      shotBubble.vy *= -1;
+    }
+
+    // Detectar colisión con otras burbujas
+    for (const bubble of bubbles) {
+      if (bubble.active && detectCollision(shotBubble, bubble)) {
+        isShooting = false;
+        shotBubble.active = true;
+        bubbles.push(shotBubble);
+        createNewPlayerBubble();
+        break;
+      }
+    }
+
+    // Si la burbuja llega al borde superior, detener el disparo
+    if (shotBubble.y - shotBubble.radius <= 0) {
+      isShooting = false;
+      shotBubble.active = true;
+      bubbles.push(shotBubble);
+      createNewPlayerBubble();
+    }
+  }
+}
+
+function detectCollision(bubble1, bubble2) {
+  const dx = bubble1.x - bubble2.x;
+  const dy = bubble1.y - bubble2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  return distance < bubble1.radius + bubble2.radius;
+}
+
+function createNewPlayerBubble() {
+  const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
+  playerBubble.color = randomColor;
+  playerImage.src = 'img/' + colorMap[randomColor];
 }
 
 function loop() {
