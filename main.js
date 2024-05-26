@@ -230,6 +230,8 @@ function update() {
       createNewPlayerBubble();
     }
   }
+
+  checkGameOver();
 }
 
 function detectCollision(bubble1, bubble2) {
@@ -296,10 +298,31 @@ function removeBubbles(group) {
   }
 }
 
+let gameOver = false;
+
+function checkGameOver() {
+  for (const bubble of bubbles) {
+    if (bubble.active && bubble.y + bubble.radius >= playerBubble.y - playerBubble.radius) {
+      gameOver = true;
+      break;
+    }
+  }
+
+  if (gameOver) {
+    alert('Game Over');
+    cancelAnimationFrame(animationFrameId);
+  }
+}
+
+let animationFrameId;
+
+
 function loop() {
-  requestAnimationFrame(loop);
-  update();
-  draw();
+  if (!gameOver) {
+    animationFrameId = requestAnimationFrame(loop);
+    update();
+    draw();
+  }
 }
 
 loop();
