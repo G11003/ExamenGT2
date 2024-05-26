@@ -10,17 +10,38 @@
     }
     body {
       background-image: url('img/fondo.jpg');
-      background-size: cover; 
-      background-position: center; 
+      background-size: cover;
+      background-position: center;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    
+    #gameOverDialog {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid black;
+      padding: 20px;
+      z-index: 1000;
+      text-align: center;
+    }
+    #gameOverDialog button {
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <canvas width="800" height="600" id="game"></canvas>
+  <div id="gameOverDialog">
+    <p>Game Over</p>
+    <button id="closeButton">Cerrar</button>
+    <button id="replayButton">Volver a jugar</button>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>

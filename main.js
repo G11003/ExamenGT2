@@ -309,13 +309,45 @@ function checkGameOver() {
   }
 
   if (gameOver) {
-    alert('Game Over');
+    document.getElementById('gameOverDialog').style.display = 'block';
     cancelAnimationFrame(animationFrameId);
   }
 }
 
 let animationFrameId;
 
+function resetGame() {
+  // Restablecer variables de juego
+  bubbles.length = 0;
+  isShooting = false;
+  gameOver = false;
+  loadedImages = 0;
+
+  // Vuelve a cargar las burbujas iniciales
+  for (let row = 0; row < level1.length; row++) {
+    for (let col = 0; col < level1[row].length; col++) {
+      const color = level1[row][col];
+      createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+    }
+  }
+
+  // Crear una nueva burbuja de jugador
+  createNewPlayerBubble();
+
+  // Ocultar el diálogo de Game Over
+  document.getElementById('gameOverDialog').style.display = 'none';
+
+  // Reiniciar el bucle de animación
+  loop();
+}
+
+document.getElementById('closeButton').addEventListener('click', () => {
+  document.getElementById('gameOverDialog').style.display = 'none';
+});
+
+document.getElementById('replayButton').addEventListener('click', () => {
+  location.reload(); // Recargar la página
+});
 
 function loop() {
   if (!gameOver) {
