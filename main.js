@@ -84,7 +84,7 @@ const playerBubble = {
 
 const playerImage = loadImage(colorMap[randomColor]);
 
-let shootDeg = 0;
+let shootDeg = -Math.PI / 2; // Apuntar hacia arriba
 const minDeg = -Math.PI / 3;
 const maxDeg = Math.PI / 3;
 let shootDir = 0;
@@ -108,22 +108,29 @@ canvas.addEventListener('mousemove', updatePlayerPosition);
 function drawArrow() {
   context.save();
   context.translate(playerBubble.x, playerBubble.y);
-  context.rotate(shootDeg);
-  context.translate(0, -playerBubble.radius * 2);
+  context.rotate(shootDeg); 
+  const arrowLength = 30; // Longitud de la flecha
+  const arrowWidth = 5; // Ancho de la flecha
+
+  const startX = 0; // Comienza en el mismo punto que la pelotita
+  const startY = -playerBubble.radius * bubbleRadiusFactor; // Va hacia arriba desde la pelotita
+
+  context.translate(startX, startY);
 
   context.strokeStyle = 'white';
   context.lineWidth = 2;
   context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(0, -playerBubble.radius * 4);
-  context.moveTo(0, 0);
-  context.lineTo(-10, -playerBubble.radius * 0.8);
-  context.moveTo(0, 0);
-  context.lineTo(10, -playerBubble.radius * 0.8);
+  context.moveTo(0, 0); 
+  context.lineTo(0, -arrowLength); // Línea central de la flecha (hacia arriba)
+  context.moveTo(0, -arrowLength); // Mueve el punto de inicio a la punta de la flecha
+  context.lineTo(-arrowWidth / 2, -arrowLength + arrowWidth); // Línea izquierda de la flecha
+  context.moveTo(0, -arrowLength); // Mueve el punto de inicio a la punta de la flecha
+  context.lineTo(arrowWidth / 2, -arrowLength + arrowWidth); // Línea derecha de la flecha
   context.stroke();
 
   context.restore();
 }
+
 
 function drawPlayer() {
   context.drawImage(playerImage, playerBubble.x - playerBubble.radius, playerBubble.y - playerBubble.radius, playerBubble.radius * 2, playerBubble.radius * 2);
