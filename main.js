@@ -5,14 +5,11 @@ const context = canvas.getContext('2d');
 const canvasWidth = 550;
 const canvasHeight = 600;
 
-// Margen añadido al canvas
-const margin = 50;
+const margin = 70;
 
-// Tamaño del canvas real (sin margen)
 const realCanvasWidth = canvasWidth - 2 * margin;
 const realCanvasHeight = canvasHeight;
 
-// Ajustar el tamaño del canvas para incluir el margen
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
@@ -67,7 +64,7 @@ function createBubble(x, y, color) {
 
   bubbles.push({
     x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
-    y: y + center + 7,
+    y: y + center + 30,
     radius: grid / 2 * bubbleRadiusFactor, // Aumentamos el radio de la burbuja
     color: color,
     active: color ? true : false,
@@ -87,10 +84,25 @@ function drawBubbles() {
   context.fillStyle = 'white';
   context.font = '15px Century Gothic';
   context.fillText(`Score: ${score}`, margin, 20);
+
+const textBottom = 'Espinosa Gabriela';
+const textBottomWidth = context.measureText(textBottom).width;
+const textBottomX = (canvasWidth - textBottomWidth ) / 2;
+const textBottomY = canvasHeight - 10; 
+
+context.fillText(textBottom, textBottomX, textBottomY);
+
+const textTop = 'PLANET SHOOTER';
+const textTopWidth = context.measureText(textTop).width;
+const textTopX = (canvasWidth - textTopWidth - 30) / 2;
+const textTopY = 15; 
+context.font = '20px Century Gothic';
+context.fillText(textTop, textTopX, textTopY);
+
 }
 
 const totalWidth = level1[0].length * (grid + bubbleGap);
-const startX = (realCanvasWidth - totalWidth) / 2 + margin; // Ajustar el inicio con el margen
+const startX = (realCanvasWidth - totalWidth) / 2 + margin; 
 
 for (let row = 0; row < level1.length; row++) {
   for (let col = 0; col < level1[row].length; col++) {
@@ -102,7 +114,7 @@ for (let row = 0; row < level1.length; row++) {
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
   x: realCanvasWidth / 2 + margin, // Ajustar la posición inicial con el margen
-  y: realCanvasHeight - grid + 5 / 2,
+  y: realCanvasHeight - grid / 2 - 25,
   radius: grid / 2 * bubbleRadiusFactor,
   color: randomColor
 };
