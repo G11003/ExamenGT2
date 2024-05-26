@@ -17,7 +17,7 @@ canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
 const grid = 32;
-const bubbleGap = 9;
+const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
   ['1', '1', '2', '2', '3', '3', '4', '4'],
@@ -211,12 +211,12 @@ function update() {
       if (bubble.active && detectCollision(shotBubble, bubble)) {
         isShooting = false;
         shotBubble.active = true;
+        positionShotBubble(shotBubble, bubble);
         bubbles.push(shotBubble);
         const group = findGroup(shotBubble);
         if (group.length >= 3) {
           removeBubbles(group);
         }
-
         createNewPlayerBubble();
         break;
       }
@@ -236,7 +236,16 @@ function detectCollision(bubble1, bubble2) {
   const dx = bubble1.x - bubble2.x;
   const dy = bubble1.y - bubble2.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
-  return distance < bubble1.radius + bubble2.radius;
+  return distance < bubble1.radius + bubble2.radius - bubbleGap; // Reducir la distancia de colisión
+}
+
+function positionShotBubble(shotBubble, targetBubble) {
+  const dx = shotBubble.x - targetBubble.x;
+  const dy = shotBubble.y - targetBubble.y;
+  const angle = Math.atan2(dy, dx);
+
+  shotBubble.x = targetBubble.x + Math.cos(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
+  shotBubble.y = targetBubble.y + Math.sin(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
 }
 
 function createNewPlayerBubble() {
@@ -269,6 +278,7 @@ function getNeighbors(bubble) {
   
   return neighbors;
 }
+
 function findGroup(bubble, group = []) {
   group.push(bubble);
   const neighbors = getNeighbors(bubble).filter(b => b.color === bubble.color && !group.includes(b));
