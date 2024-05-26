@@ -79,14 +79,31 @@ function getClosestBubble(obj, activeState = false) {
     return;
   }
 
+
+  return closestBubbles
+    .map(bubble => {
+      return {
+        distance: getDistance(obj, bubble),
+        bubble
+      }
+    })
+    .sort((a, b) => a.distance - b.distance)[0].bubble;
+}
+
+function createBubble(x, y, color) {
+  const row = Math.floor(y / grid);
+  const col = Math.floor(x / grid);
+
+  const startX = row % 2 === 0 ? 0 : 0.5 * grid;
+  const center = grid / 2;
+
   bubbles.push({
-    x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
-    y: y + center + 7,
-    radius: grid / 2 * bubbleRadiusFactor, // Aumentamos el radio de la burbuja
+    x: wallSize + (grid + bubbleGap) * col + startX + center,
+    y: wallSize + (grid + bubbleGap - 4) * row + center,
+    radius: grid / 2,
     color: color,
     active: color ? true : false,
-    row: row,
-    col: col
+    imageIndex: colors.indexOf(color) // Almacenar el índice de la imagen correspondiente al color
   });
 }
 
@@ -289,41 +306,59 @@ function checkAndPopBubbles(bubble) {
 }
 
 
-function checkAndPopBubbles(bubble) {
-  const stack = [bubble];
-  const connectedBubbles = [];
-  const visited = new Set();
+function getNeighbors(bubble) {
+  const neighbors = [];
+  const dirs = [
+    rotatePoint(grid, 0, 0),
+    rotatePoint(grid, 0, degToRad(60)),
+    rotatePoint(grid, 0, degToRad(120)),
+    rotatePoint(grid, 0, degToRad(180)),
+    rotatePoint(grid, 0, degToRad(240)),
+    rotatePoint(grid, 0, degToRad(300))
+  ];
 
-  while (stack.length > 0) {
-    const currentBubble = stack.pop();
-    const key = `${currentBubble.row},${currentBubble.col}`;
-    if (visited.has(key)) continue;
+  for (let i = 0; i < dirs.length; i++) {
+    const dir = dirs[i];
+    const newBubble = {
+      x: bubble.x + dir.x,
+      y: bubble.y + dir.y,
+      radius: bubble.radius
+    };
+    const neighbor = getClosestBubble(newBubble, true);
+    if (neighbor && neighbor !== bubble && !neighbors.includes(neighbor)) {
+      neighbors.push(neighbor);
+    }
+  }
 
-    visited.add(key);
-    connectedBubbles.push(currentBubble);
+  return neighbors;
+}
 
-    for (const neighbor of getNeighbors(currentBubble)) {
-      if (neighbor.color === currentBubble.color) {
-        stack.push(neighbor);
+function removeMatch(targetBubble) {
+  const matches = [targetBubble];
+
+  bubbles.forEach(bubble => bubble.processed = false);
+  targetBubble.processed = true;
+
+  let neighbors = getNeighbors(targetBubble);
+  for (let i = 0; i < neighbors.length; i++) {
+    let neighbor = neighbors[i];
+
+    if (!neighbor.processed) {
+      neighbor.processed = true;
+
+      if (neighbor.color === targetBubble.color) {
+        matches.push(neighbor);
+        neighbors = neighbors.concat(getNeighbors(neighbor));
       }
     }
   }
 
-  if (connectedBubbles.length >= 3) {
-    for (const b of connectedBubbles) {
-      b.active = false;
-    }
+  if (matches.length >= 3) {
+    matches.forEach(bubble => {
+      bubble.active = false;
+    });
   }
 }
-
-function getNeighbors(bubble) {
-  const neighbors = [];
-  const directions = [
-    { dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
-    { dx: 1, dy: 1 }, { dx: -1, dy: -1 },
-    { dx: 1, dy: -1 }, { dx: -1, dy: 1 } // Diagonales adicionales
-  ];
-
   for (const direction of directions) {
     const neighborRow = bubble.row + direction.dy;
     const neighborCol = bubble.col + direction.dx;
