@@ -33,36 +33,51 @@ const colorMap = {
   '4': 'b4.png'
 };
 
+const colors = Object.values(colorMap);
+
+const bubbleGap = 1;
+const wallSize = 4;
 const bubbles = [];
+let particles = [];
+const bubbleImages = [];
+const numBubbleImages = 4;
 
-const images = {};
-let loadedImages = 0;
+function degToRad(deg) {
+  return (deg * Math.PI) / 180;
+}
 
-function loadImage(src) {
-  const img = new Image();
-  img.onload = () => {
-    loadedImages++;
-    if (loadedImages === Object.keys(colorMap).length) {
-      drawBubbles();
-    }
+function rotatePoint(x, y, angle) {
+  let sin = Math.sin(angle);
+  let cos = Math.cos(angle);
+
+  return {
+    x: x * cos - y * sin,
+    y: x * sin + y * cos
   };
-  img.src = 'img/' + src;
-  return img;
+}
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-for (const color in colorMap) {
-  images[color] = loadImage(colorMap[color]);
+function getDistance(obj1, obj2) {
+  const distX = obj1.x - obj2.x;
+  const distY = obj1.y - obj2.y;
+  return Math.sqrt(distX * distX + distY * distY);
 }
 
-// Cargar la imagen del puntero personalizado
-const customPointer = loadImage('punto.png');
+function collides(obj1, obj2) {
+  return getDistance(obj1, obj2) < obj1.radius + obj2.radius;
+}
 
-function createBubble(x, y, color) {
-  const row = Math.floor(y / grid);
-  const col = Math.floor(x / grid);
+function getClosestBubble(obj, activeState = false) {
+  const closestBubbles = bubbles
+    .filter(bubble => bubble.active == activeState && collides(obj, bubble));
 
-  const startX = row % 2 === 0 ? 0 : -0.5 * grid;
-  const center = grid / 2;
+  if (!closestBubbles.length) {
+    return;
+  }
 
   bubbles.push({
     x: x + startX + center + (row % 2 === 0 ? 0 : -4), // Ajustamos el startX para la cuarta fila
