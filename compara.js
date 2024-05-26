@@ -176,11 +176,11 @@ for (let row = 0; row < 10; row++) {
   }
 }
 
-const curBubblePos = {
+const curBubblePos = { //playerBubblePos
   x: canvas.width / 2,
   y: canvas.height - grid * 1.5
 };
-const curBubble = {
+const curBubble = { //playerImage
   x: curBubblePos.x,
   y: curBubblePos.y,
   color: 'red',
