@@ -37,6 +37,7 @@ const bubbles = [];
 
 const images = {};
 let loadedImages = 0;
+let score = 0; // Puntuación inicializada a 0
 
 function loadImage(src) {
   const img = new Image();
@@ -81,6 +82,11 @@ function drawBubbles() {
     const img = images[bubble.color];
     context.drawImage(img, bubble.x - bubble.radius, bubble.y - bubble.radius, bubble.radius * 2, bubble.radius * 2);
   });
+
+  // Dibujar la puntuación en la esquina superior izquierda
+  context.fillStyle = 'white';
+  context.font = '15px Century Gothic';
+  context.fillText(`Score: ${score}`, margin, 20);
 }
 
 const totalWidth = level1[0].length * (grid + bubbleGap);
@@ -215,6 +221,7 @@ function update() {
         bubbles.push(shotBubble);
         const group = findGroup(shotBubble);
         if (group.length >= 3) {
+          score += group.length * 10; // Aumentar la puntuación
           removeBubbles(group);
         }
         createNewPlayerBubble();
@@ -268,7 +275,7 @@ function getNeighbors(bubble) {
     { dx: -grid / 2, dy: grid * Math.sqrt(3) / 2 },
     { dx: grid / 2, dy: grid * Math.sqrt(3) / 2 }
   ];
-  
+
   for (const direction of directions) {
     const neighborX = bubble.x + direction.dx;
     const neighborY = bubble.y + direction.dy;
@@ -277,18 +284,18 @@ function getNeighbors(bubble) {
       neighbors.push(neighbor);
     }
   }
-  
+
   return neighbors;
 }
 
 function findGroup(bubble, group = []) {
   group.push(bubble);
   const neighbors = getNeighbors(bubble).filter(b => b.color === bubble.color && !group.includes(b));
-  
+
   for (const neighbor of neighbors) {
     findGroup(neighbor, group);
   }
-  
+
   return group;
 }
 
@@ -311,6 +318,7 @@ function checkGameOver() {
   if (gameOver) {
     document.getElementById('gameOverDialog').style.display = 'block';
     cancelAnimationFrame(animationFrameId);
+    document.getElementById('finalScore').innerText = `Final Score: ${score}`; // Mostrar la puntuación final
   }
 }
 
@@ -322,6 +330,7 @@ function resetGame() {
   isShooting = false;
   gameOver = false;
   loadedImages = 0;
+  score = 0; // Reiniciar la puntuación
 
   // Vuelve a cargar las burbujas iniciales
   for (let row = 0; row < level1.length; row++) {
