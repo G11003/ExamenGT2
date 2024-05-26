@@ -260,6 +260,34 @@ function checkAndPopBubbles(bubble) {
     connectedBubbles.push(currentBubble);
 
     for (const neighbor of getNeighbors(currentBubble)) {
+      if (neighbor.color === currentBubble.color && !visited.has(`${neighbor.row},${neighbor.col}`)) {
+        stack.push(neighbor);
+      }
+    }
+  }
+
+  if (connectedBubbles.length >= 3) {
+    for (const b of connectedBubbles) {
+      b.active = false;
+    }
+  }
+}
+
+
+function checkAndPopBubbles(bubble) {
+  const stack = [bubble];
+  const connectedBubbles = [];
+  const visited = new Set();
+
+  while (stack.length > 0) {
+    const currentBubble = stack.pop();
+    const key = `${currentBubble.row},${currentBubble.col}`;
+    if (visited.has(key)) continue;
+
+    visited.add(key);
+    connectedBubbles.push(currentBubble);
+
+    for (const neighbor of getNeighbors(currentBubble)) {
       if (neighbor.color === currentBubble.color) {
         stack.push(neighbor);
       }
@@ -277,21 +305,114 @@ function getNeighbors(bubble) {
   const neighbors = [];
   const directions = [
     { dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
-    { dx: 1, dy: 1 }, { dx: -1, dy: -1 }
+    { dx: 1, dy: 1 }, { dx: -1, dy: -1 },
+    { dx: 1, dy: -1 }, { dx: -1, dy: 1 } // Diagonales adicionales
   ];
 
   for (const direction of directions) {
     const neighborRow = bubble.row + direction.dy;
     const neighborCol = bubble.col + direction.dx;
-    const neighbor = bubbles.find(b => b.row === neighborRow && b.col === neighborCol);
-    if (neighbor && neighbor.active) {
-      neighbors.push(neighbor);
+    // Verifica si el vecino está dentro de los límites del canvas
+    if (neighborRow >= 0 && neighborRow < level1.length && neighborCol >= 0 && neighborCol < level1[0].length) {
+      const neighborColor = level1[neighborRow][neighborCol];
+      // Busca la burbuja en base a su posición y tipo
+      const neighbor = bubbles.find(b => b.row === neighborRow && b.col === neighborCol && b.color === neighborColor);
+      if (neighbor && neighbor.active) {
+        neighbors.push(neighbor);
+      }
     }
   }
 
   return neighbors;
 }
 
+
+
+function update() {
+  if (isShooting && shotBubble) {
+    shotBubble.x += shotBubble.vx;
+    shotBubble.y += shotBubble.vy;
+
+    // Detectar colisión con los bordes del canvas
+    if (shotBubble.x - shotBubble.radius < margin || shotBubble.x + shotBubble.radius > canvasWidth - margin) {
+      shotBubble.vx *= -1;
+    }
+
+    if (shotBubble.y - shotBubble.radius < 0) {
+      shotBubble.vy *= -1;
+    }
+
+    // Detectar colisión con otras burbujas
+    for (const bubble of bubbles) {
+      if (bubble.active && detectCollision(shotBubble, bubble)) {
+        isShooting = false;
+        shotBubble.active = true;
+        shotBubble.row = bubble.row;
+        shotBubble.col = bubble.col;
+        bubbles.push(shotBubble);
+        checkAndPopBubbles(shotBubble);
+        createNewPlayerBubble();
+        break;
+      }
+    }
+
+    // Si la burbuja llega al borde superior, detener el disparo
+    if (shotBubble.y - shotBubble.radius <= 0) {
+      isShooting = false;
+      shotBubble.active = true;
+      bubbles.push(shotBubble);
+      checkAndPopBubbles(shotBubble);
+      createNewPlayerBubble();
+    }
+  }
+
+  // Verificar si hay burbujas flotantes y hacerlas caer
+  let floatingBubbles = bubbles.filter(bubble => bubble.active && bubble.y - bubble.radius <= 0 && bubble.row > 0);
+  while (floatingBubbles.length > 0) {
+    let falling = false;
+    for (const bubble of floatingBubbles) {
+      const neighbors = getNeighbors(bubble);
+      if (neighbors.length === 0 || neighbors.some(neighbor => !neighbor.active)) {
+        bubble.y += grid;
+        falling = true;
+      }
+    }
+    if (!falling) break;
+    floatingBubbles = bubbles.filter(bubble => bubble.active && bubble.y - bubble.radius <= 0 && bubble.row > 0);
+  }
+}
+
+function checkAndPopBubbles(bubble) {
+  const stack = [bubble];
+  const connectedBubbles = [];
+  const visited = new Set();
+
+  while (stack.length > 0) {
+    const currentBubble = stack.pop();
+    const key = `${currentBubble.row},${currentBubble.col}`;
+    if (visited.has(key)) continue;
+
+    visited.add(key);
+    connectedBubbles.push(currentBubble);
+
+    // Buscar secuencialmente todas las burbujas adyacentes del mismo color
+    for (const otherBubble of bubbles) {
+      if (
+        otherBubble.active &&
+        otherBubble.color === currentBubble.color &&
+        !visited.has(`${otherBubble.row},${otherBubble.col}`)
+      ) {
+        stack.push(otherBubble);
+      }
+    }
+  }
+
+  if (connectedBubbles.length >= 3) {
+    for (const b of connectedBubbles) {
+      b.active = false;
+    }
+  }
+}
 function loop() {
   requestAnimationFrame(loop);
   update();
