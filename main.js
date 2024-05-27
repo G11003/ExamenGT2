@@ -2,31 +2,32 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
 // Tamaño del canvas con margen
-const canvasWidth = 500;
+const canvasWidth = 550;
 const canvasHeight = 600;
 
 const margin = 40;
 
-const realCanvasWidth = canvasWidth - 1* margin;
-const realCanvasHeight = canvasHeight - 2 * margin;
+const realCanvasWidth = canvasWidth - 2 * margin;
+const realCanvasHeight = canvasHeight;
 
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
-const grid = 30;
+const grid = 32;
 const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
-  ['1', '1', '2', '2', '3', '3', '2', '2'],
+  ['1', '1', '2', '2', '3', '3', '4', '4'],
   ['2', '3', '3', '1', '1', '2', '2', '1', '2'],
-  ['2', '1', '2', '2', '3', '1', '3', '3'],
-
+  ['2', '1', '2', '2', '4', '1', '3', '3'],
+  ['1', '3', '3', '1', '4', '1', '4', '2', '2']
 ];
 
 const colorMap = {
   '1': 'b1.png',
   '2': 'b2.png',
   '3': 'b6.png',
+  '4': 'b4.png'
 };
 
 const bubbles = [];
@@ -49,29 +50,6 @@ function loadImage(src) {
 
 for (const color in colorMap) {
   images[color] = loadImage(colorMap[color]);
-}
-
-// Función para mezclar aleatoriamente un arreglo
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
-// Copia el nivel original y mezcla aleatoriamente las filas
-const randomizedLevel = level1.map(row => shuffleArray([...row]));
-
-const totalWidth = randomizedLevel[0].length * (grid + bubbleGap);
-const startX = (realCanvasWidth - totalWidth) / 2 + margin;
-
-// Crear burbujas aleatorias usando el nivel mezclado
-for (let row = 0; row < randomizedLevel.length; row++) {
-  for (let col = 0; col < randomizedLevel[row].length; col++) {
-    const color = randomizedLevel[row][col];
-    createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
-  }
 }
 
 // Cargar la imagen del puntero personalizado
@@ -105,23 +83,38 @@ function drawBubbles() {
   // Dibujar la puntuación en la esquina superior izquierda
   context.fillStyle = 'white';
   context.font = '15px Century Gothic';
+  context.fillText(`Score: ${score}`, margin, 20);
 
-const textBottom = 'Espinosa Gabriela';
-const textBottomWidth = context.measureText(textBottom).width;
-const textBottomX = (canvasWidth - textBottomWidth ) / 2;
-const textBottomY = canvasHeight - 10; 
+  // Dibujar el nivel en el lado derecho
+  context.textAlign = 'right'; // Alinear el texto a la derecha
+  context.fillText(`Nivel: ${score}`, canvasWidth - margin, 20);
 
-context.fillText(textBottom, textBottomX, textBottomY);
+  const textBottom = 'Espinosa Gabriela';
+  const textBottomWidth = context.measureText(textBottom).width;
+  const textBottomX = (canvasWidth - textBottomWidth) / 2;
+  const textBottomY = canvasHeight - 10;
 
-const textTop = 'PLANET SHOOTER';
-const textTopWidth = context.measureText(textTop).width;
-const textTopX = (canvasWidth - textTopWidth - 30) / 2;
-const textTopY = 15; 
-context.font = '20px Century Gothic';
-context.fillText(textTop, textTopX, textTopY);
+  context.fillText(textBottom, textBottomX, textBottomY);
 
+  const textTop = 'PLANET SHOOTER';
+  const textTopWidth = context.measureText(textTop).width;
+  const textTopX = (canvasWidth - textTopWidth - 30) / 2;
+  const textTopY = 15;
+  context.font = '20px Century Gothic';
+  context.textAlign = 'center';
+  context.fillText(textTop, textTopX, textTopY);
 }
 
+
+const totalWidth = level1[0].length * (grid + bubbleGap);
+const startX = (realCanvasWidth - totalWidth) / 2 + margin; 
+
+for (let row = 0; row < level1.length; row++) {
+  for (let col = 0; col < level1[row].length; col++) {
+    const color = level1[row][col];
+    createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+  }
+}
 
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
@@ -347,6 +340,7 @@ function checkGameOver() {
 }
 
 let animationFrameId;
+
 function resetGame() {
   // Restablecer variables de juego
   bubbles.length = 0;
