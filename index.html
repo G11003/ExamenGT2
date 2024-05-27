@@ -7,6 +7,9 @@
     html, body {
       height: 100%;
       margin: 0;
+      font-family: 'Century Gothic', sans-serif;
+      color: white;
+      text-align: center;
     }
     body {
       background-image: url('img/fondo.jpg');
@@ -15,6 +18,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column; /* Alinear los elementos verticalmente */
     }
     #gameOverDialog {
       display: none;
@@ -33,6 +37,18 @@
       padding: 10px 20px;
       cursor: pointer;
     }
+    #scoreDisplay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      text-align: left;
+    }
+    #textTop {
+      margin-top: auto; /* Alinear al centro vertical */
+    }
+    #textBottom {
+      margin-bottom: auto; /* Alinear al centro vertical */
+    }
   </style>
 </head>
 <body>
@@ -43,6 +59,9 @@
     <button id="closeButton">Cerrar</button>
     <button id="replayButton">Volver a jugar</button>
   </div>
+  <div id="scoreDisplay">Score: 0 <br> <span id="levelDisplay">Nivel: 1</span></div>
+
+
   <script src="main.js"></script>
 </body>
 </html>

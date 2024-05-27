@@ -2,32 +2,31 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
 // Tamaño del canvas con margen
-const canvasWidth = 650;
+const canvasWidth = 500;
 const canvasHeight = 600;
 
-const margin = 70;
+const margin = 40;
 
-const realCanvasWidth = canvasWidth - 2 * margin;
-const realCanvasHeight = canvasHeight;
+const realCanvasWidth = canvasWidth - 1* margin;
+const realCanvasHeight = canvasHeight - 2 * margin;
 
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
-const grid = 32;
+const grid = 30;
 const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4'],
+  ['1', '1', '2', '2', '3', '3', '2', '2'],
   ['2', '3', '3', '1', '1', '2', '2', '1', '2'],
-  ['2', '1', '2', '2', '4', '1', '3', '3'],
-  ['1', '3', '3', '1', '4', '1', '4', '2', '2']
+  ['2', '1', '2', '2', '3', '1', '3', '3'],
+
 ];
 
 const colorMap = {
   '1': 'b1.png',
   '2': 'b2.png',
   '3': 'b6.png',
-  '4': 'b4.png'
 };
 
 const bubbles = [];
@@ -106,7 +105,6 @@ function drawBubbles() {
   // Dibujar la puntuación en la esquina superior izquierda
   context.fillStyle = 'white';
   context.font = '15px Century Gothic';
-  context.fillText(`Score: ${score}`, margin, 20);
 
 const textBottom = 'Espinosa Gabriela';
 const textBottomWidth = context.measureText(textBottom).width;
@@ -123,6 +121,7 @@ context.font = '20px Century Gothic';
 context.fillText(textTop, textTopX, textTopY);
 
 }
+
 
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
 const playerBubble = {
