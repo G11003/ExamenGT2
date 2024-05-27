@@ -13,75 +13,57 @@ const realCanvasHeight = canvasHeight;
 canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
-const grid = 32;
+const grid = 28;
 const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
+
 const colorMap = {
   '1': 'b1.png',
   '2': 'b2.png',
   '3': 'b3.png',
   '4': 'b4.png',
-  '5': 'b5.png', 
-  '7': 'b7.png', 
+  '5': 'b5.png', // Se añaden dos nuevas imágenes para el color 5 y 6
+  '6': 'b6.png',
+  '7': 'b7.png', // Se añade una nueva imagen para el color 7
   '8': 'b8.png'
 };
 // Define los nuevos niveles
 const level1 = [
-  ['1', '1', '2', '2', '3', '3'],
-  ['1', '1', '2', '2', '3', '3'],
-  ['1', '1', '2', '2', '3', '3']
+  ['1', '2', '3', '4', '5','6'],
+  ['7', '8', '8', '7', '6','5'],
+  ['3', '2', '1', '2', '3','4']
 ];
 
 const level2 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5'], 
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5'], 
+  ['1', '6', '7', '5', '4', '3', '4', '8'], 
+  ['2', '5', '8', '6', '3', '2', '5', '8'], 
+  ['3', '4', '8', '7', '2', '1', '6', '7']
 ];
 
 const level3 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['8'] 
+  ['1', '1', '2', '2', '3', '3', '4', '5', '6'],
+  ['5', '5', '6', '6', '7', '7', '8', '7', '6'],
+  ['4', '4', '3', '3', '2', '2', '1', '2', '3'],
 ];
 
 const level4 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
-  ['8', '9'] 
+  ['1', '1', '2', '2', '3', '4', '5', '6', '7'],
+  ['1', '1', '2', '2', '3', '3', '4', '5', '6'],
+  ['5', '5', '6', '7', '8', '8', '7', '7', '6'],
+  ['1', '1', '2', '2', '3', '4', '5', '6', '7'],
 ];
 
 const level5 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
-  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8']
+  ['1', '1', '2', '2', '3', '4', '4', '5', '6', '7', '8'],
+  ['1', '1', '2', '2', '3', '3', '4', '5', '5', '6','7'],
+  ['5', '5', '6', '6', '7', '8', '8', '7', '7', '6','5'],
+  ['1', '1', '2', '2', '3', '3', '4', '5', '6', '7','4'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '8']
 ];
 
 // Reemplaza las definiciones anteriores de los niveles con los nuevos niveles
-const levels = [
-  generateLevel(level1, colorMap),
-  generateLevel(level2, colorMap),
-  generateLevel(level3, colorMap),
-  generateLevel(level4, colorMap),
-  generateLevel(level5, colorMap)
-]; // Definir los niveles
+const levels = [level1, level2, level3, level4, level5]; // Definir los niveles
 
-function generateLevel(levelDefinition, colorMap) {
-  const level = [];
-
-  for (let row = 0; row < levelDefinition.length; row++) {
-    const newRow = [];
-    for (let col = 0; col < levelDefinition[row].length; col++) {
-      const colorKey = levelDefinition[row][col];
-      newRow.push(colorMap[colorKey]);
-    }
-    level.push(newRow);
-  }
-
-  return level;
-}
 const bubbles = [];
 
 const images = {};
@@ -159,6 +141,7 @@ function drawBubbles() {
   context.fillStyle = 'white';
   context.font = '15px Century Gothic';
   context.fillText(`Score: ${score}`, margin, 20);
+  context.fillText(`Top: ${highScore}`, margin, 40); 
   // Dibujar el nivel en el lado derecho
   context.textAlign = 'right'; // Alinear el texto a la derecha
   context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin, 20);
@@ -282,6 +265,7 @@ function checkAllBubblesCleared() {
   return bubbles.every(bubble => !bubble.active);
 }
 function createRandomizedLevel(images) {
+
   const level = [];
 
   for (let row = 0; row < rows; row++) {
@@ -295,24 +279,7 @@ function createRandomizedLevel(images) {
   }
 
   return level;
-  
 }
-function loadNextLevel() {
-  const levelData = levels[currentLevel];
-  if (levelData) {
-    // Limpiar burbujas actuales
-    bubbles.length = 0;
-    // Crear burbujas del nuevo nivel
-    const randomizedLevel = createRandomizedLevel(levelData.images);
-    createBubblesFromLevel(randomizedLevel);
-    createNewPlayerBubble(levelData.images); // Pasar el arreglo de imágenes específico del nivel actual
-    currentLevel++;
-  } else {
-    // Si no hay más niveles, podrías mostrar un mensaje de juego completado o reiniciar desde el primer nivel.
-    console.log("¡Felicidades! Has completado todos los niveles.");
-  }
-}
-
 
 function loadNextLevel() {
   if (currentLevel < levels.length) {
@@ -321,10 +288,18 @@ function loadNextLevel() {
     
     // Cargar el siguiente nivel
     const level = levels[currentLevel];
-    for (let row = 0; row < level.length; row++) {
-      for (let col = 0; col < level[row].length; col++) {
+    const numRows = level.length;
+    const numCols = level[0].length;
+    
+    // Calcular la posición inicial para centrar horizontalmente
+    const startX = (realCanvasWidth - (numCols * (grid + bubbleGap + 3) - bubbleGap)) / 2 + margin;
+    const startY = 0; // Alinear con el borde superior del canvas
+    
+    // Crear burbujas del nuevo nivel centradas horizontalmente
+    for (let row = 0; row < numRows; row++) {
+      for (let col = 0; col < numCols; col++) {
         const color = level[row][col];
-        createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+        createBubble(startX + col * (grid + bubbleGap + 3), startY + row * (grid + bubbleGap), color);
       }
     }
 
@@ -338,6 +313,7 @@ function loadNextLevel() {
     document.getElementById('finalScore').innerText = `Final Score: ${score}`;
   }
 }
+
   function update() {
     if (isShooting && shotBubble) {
       shotBubble.x += shotBubble.vx;
@@ -399,10 +375,10 @@ function loadNextLevel() {
     shotBubble.y = targetBubble.y + Math.sin(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
   }
   
-  function createNewPlayerBubble(images) {
-    const randomColor = images[Math.floor(Math.random() * images.length)]; // Escoger un color aleatorio del arreglo de imágenes específico para el nivel
+  function createNewPlayerBubble() {
+    const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
     playerBubble.color = randomColor;
-    playerImage.src = 'img/' + randomColor;
+    playerImage.src = 'img/' + colorMap[randomColor];
   }
   
   function getNeighbors(bubble) {
@@ -448,38 +424,63 @@ function loadNextLevel() {
   }
   
   let gameOver = false;
-  
-  function checkGameOver() {
-    for (const bubble of bubbles) {
-      if (bubble.active && bubble.y + bubble.radius >= playerBubble.y - playerBubble.radius) {
-        gameOver = true;
-        break;
-      }
-    }
-  
-    if (gameOver) {
-      document.getElementById('gameOverDialog').style.display = 'block';
-      cancelAnimationFrame(animationFrameId);
-      document.getElementById('finalScore').innerText = `Final Score: ${score}`; // Mostrar la puntuación final
+  let highScore = localStorage.getItem('highScore');
+if (!highScore) {
+  highScore = 0; // Si no hay un puntaje más alto guardado, inicializar en 0
+} else {
+  highScore = parseInt(highScore); // Convertir el puntaje más alto a entero
+}
+
+// Función para actualizar y mostrar el puntaje más alto
+function updateHighScore() {
+  // Verificar si el puntaje actual es mayor que el puntaje más alto guardado
+  if (score > highScore) {
+    highScore = score; // Actualizar el puntaje más alto
+    localStorage.setItem('highScore', highScore); // Guardar el nuevo puntaje más alto en localStorage
+  }
+}
+function checkGameOver() {
+  for (const bubble of bubbles) {
+    if (bubble.active && bubble.y + bubble.radius >= playerBubble.y - playerBubble.radius) {
+      gameOver = true;
+      break;
     }
   }
-  document.addEventListener("DOMContentLoaded", function() {
-    const startDialog = document.getElementById("startDialog");
-    const startButton = document.getElementById("startButton");
-  
-    // Mostrar la ventana de inicio del juego al cargar la página
-    startDialog.style.display = "block";
-  
-    // Función para cerrar la ventana de inicio del juego
-    function closeStartDialog() {
-      startDialog.style.display = "none";
-    }
-  
-    // Cerrar la ventana de inicio del juego al hacer clic en el botón "Iniciar juego"
-    startButton.addEventListener("click", function() {
-      closeStartDialog();
-    });
+
+  if (gameOver) {
+    updateHighScore(); // Actualizar el puntaje más alto
+    document.getElementById('gameOverDialog').style.display = 'block';
+    cancelAnimationFrame(animationFrameId);
+    document.getElementById('finalScore').innerText = `Final Score: ${score}`; // Mostrar la puntuación final
+    document.getElementById('highScore').innerText = `Top: ${highScore}`; // Mostrar el puntaje más alto
+  }
+}
+document.addEventListener("DOMContentLoaded", function() {
+  const startDialog = document.getElementById("startDialog");
+  const startButton = document.getElementById("startButton");
+  const resetScoreButton = document.getElementById("resetScoreButton"); // Nuevo botón para reiniciar el score más alto
+
+  // Mostrar la ventana de inicio del juego al cargar la página
+  startDialog.style.display = "block";
+
+  // Función para cerrar la ventana de inicio del juego
+  function closeStartDialog() {
+    startDialog.style.display = "none";
+  }
+
+  // Cerrar la ventana de inicio del juego al hacer clic en el botón "Iniciar juego"
+  startButton.addEventListener("click", function() {
+    closeStartDialog();
   });
+
+  // Función para reiniciar el score más alto
+  resetScoreButton.addEventListener("click", function() {
+    // Aquí deberías agregar el código para reiniciar el score más alto, posiblemente utilizando localStorage
+    // Por ejemplo:
+    localStorage.removeItem("highScore");
+    console.log("Score más alto reiniciado");
+  });
+});
   
   let animationFrameId;
   function resetGame() {
