@@ -7,6 +7,7 @@
     html, body {
       height: 100%;
       margin: 0;
+      font-family: "Century Gothic", sans-serif; /* Cambia la fuente a Century Gothic */
     }
     body {
       background-image: url('img/fondo.jpg');
@@ -15,6 +16,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column; /* Añadido para centrar el contenido verticalmente */
+    }
+    header {
+      background-color: black;
+      color: white;
+      padding: 10px 0;
+      width: 100%;
+      text-align: center;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 10px 0;
     }
     #gameOverDialog, #startDialog {
       display: none;
@@ -33,19 +52,12 @@
       padding: 10px 20px;
       cursor: pointer;
     }
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: black;
-      color: white;
-      text-align: center;
-      padding: 10px 0;
-    }
   </style>
 </head>
 <body>
+  <header>
+    <h2>**UNFAIR PLANET SHOOTER**</h2>
+  </header>
   <canvas width="800" height="600" id="game"></canvas>
   <div id="gameOverDialog">
     <p>Game Over</p>
@@ -65,3 +77,4 @@
   <footer>Espinosa Gabriela 21200592</footer>
 </body>
 </html>
+

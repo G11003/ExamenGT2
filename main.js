@@ -145,22 +145,12 @@ function drawBubbles() {
   // Dibujar el nivel en el lado derecho
   context.textAlign = 'right'; // Alinear el texto a la derecha
   context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin, 20);
-  
-  context.fillText(textBottom, textBottomX, textBottomY);
-  
-  const textTop = 'UNFAIR PLANET SHOOTER';
-  const textTopWidth = context.measureText(textTop).width;
-  const textTopX = (canvasWidth - textTopWidth + 440) / 2;
-  const textTopY = 15; 
-  context.font = '20px Century Gothic';
-  context.fillText(textTop, textTopX, textTopY);
-  
-  }
-  
+}
+ 
   const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
   const playerBubble = {
     x: realCanvasWidth / 2 + margin, // Ajustar la posición inicial con el margen
-    y: realCanvasHeight - grid / 2 - 25,
+    y: realCanvasHeight - grid / 2 - 70,
     radius: grid / 2 * bubbleRadiusFactor,
     color: randomColor
   };
@@ -177,7 +167,7 @@ function drawBubbles() {
   }
   
   canvas.addEventListener('mousemove', updatePlayerPosition);
-  
+  //NO TOCAR PQ DESAPARRECE >:C
   function drawArrow() {
     context.save();
     context.translate(playerBubble.x, playerBubble.y);
@@ -225,7 +215,7 @@ function drawBubbles() {
       const img = images[shotBubble.color];
       context.drawImage(img, shotBubble.x - shotBubble.radius, shotBubble.y - shotBubble.radius, shotBubble.radius * 2, shotBubble.radius * 2);
     }
-  
+  //NO TOCAAAAAAAAAAAAAR
     // Ocultar el puntero del mouse predeterminado
     canvas.style.cursor = 'none';
   
@@ -309,7 +299,7 @@ function loadNextLevel() {
     document.getElementById('finalScore').innerText = `Final Score: ${score}`;
   }
 }
-
+//NO LE MUEVAS, AHI YA JALA
   function update() {
     if (isShooting && shotBubble) {
       shotBubble.x += shotBubble.vx;
@@ -370,7 +360,7 @@ function loadNextLevel() {
     shotBubble.x = targetBubble.x + Math.cos(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
     shotBubble.y = targetBubble.y + Math.sin(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
   }
-  
+  //NO LE MUEVAS PQ DESAPARECE EL TIRO
   function createNewPlayerBubble() {
     const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
     playerBubble.color = randomColor;
@@ -494,8 +484,6 @@ document.addEventListener("DOMContentLoaded", function() {
     resetGameAndScore(); // Reiniciar el juego y el score más alto al cerrar la ventana de Game Over
   });
 });
-
-
   let animationFrameId;
   function resetGame() {
     // Restablecer variables de juego
@@ -512,10 +500,8 @@ document.addEventListener("DOMContentLoaded", function() {
         createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
       }
     }
-  
     // Crear una nueva burbuja de jugador
-    createNewPlayerBubble();
-  
+    createNewPlayerBubble(); //NO LO VAYAS A BORRAR DE FAVOR Y GRACIAS
     // Ocultar el diálogo de Game Over
     document.getElementById('gameOverDialog').style.display = 'none';
   
@@ -538,7 +524,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const topLabel = document.getElementById('topScoreLabel');
     topLabel.textContent = `Top: ${highScore}`;
   }
-  
   function loop() {
     if (!gameOver) {
       animationFrameId = requestAnimationFrame(loop);
@@ -546,5 +531,4 @@ document.addEventListener("DOMContentLoaded", function() {
       draw();
     }
   }
-  
   loop();
