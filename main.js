@@ -17,7 +17,7 @@ const grid = 32;
 const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
 const level1 = [
-  ['1', '1', '2', '2', '3', '3', '4', '4'],
+  ['1', '1', '1', '1', '1', '1', '1', '1'],
 
 ];
 
@@ -25,7 +25,6 @@ const colorMap = {
   '1': 'b1.png',
   '2': 'b2.png',
   '3': 'b6.png',
-  '4': 'b4.png'
 };
 
 const bubbles = [];
@@ -227,10 +226,27 @@ function drawBubbles() {
 function checkAllBubblesCleared() {
   return bubbles.every(bubble => !bubble.active);
 }
+let activeBubbleTypes = {}; // Objeto para mantener un registro de los tipos de burbujas activas
+
+// Función para actualizar el registro de tipos de burbujas activas
+function updateActiveBubbleTypes() {
+  activeBubbleTypes = bubbles.reduce((types, bubble) => {
+    if (bubble.active) {
+      types[bubble.color] = true;
+    }
+    return types;
+  }, {});
+}
 
 function loadNextLevel() {
   currentLevel++; // Aumenta el nivel
-  // Carga el siguiente nivel (aquí puedes tener una lista de niveles)
+
+  // Agregar una fila adicional al arreglo hasta llegar a 5 filas
+  if (level1.length < 5) {
+    level1.push(['1', '1', '1', '1', '1', '1', '1', '1']);
+  }
+
+  // Cargar el siguiente nivel (aquí puedes tener una lista de niveles)
   // Por ejemplo, puedes tener un objeto "levels" que contenga todos los niveles y cargar el siguiente nivel desde ahí
   // Aquí solo cargaré el mismo nivel nuevamente para mantenerlo simple
   for (let row = 0; row < level1.length; row++) {
@@ -239,7 +255,15 @@ function loadNextLevel() {
       createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
     }
   }
+  
+  // Comprueba qué tipos de burbujas están activas y elimina los que no están presentes en el siguiente nivel
+  for (const color in colorMap) {
+    if (!activeBubbleTypes[color]) {
+      delete playerBubble[color];
+    }
+  }
 }
+
   function update() {
     if (isShooting && shotBubble) {
       shotBubble.x += shotBubble.vx;
