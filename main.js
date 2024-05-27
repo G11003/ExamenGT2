@@ -473,20 +473,32 @@ document.addEventListener("DOMContentLoaded", function() {
     closeStartDialog();
   });
 
-  // Función para reiniciar el score más alto y el juego
-  resetScoreButton.addEventListener("click", function() {
-    // Reiniciar el registro del score más alto
-    localStorage.removeItem("highScore");
-    console.log("Score más alto reiniciado");
-
-    // Reiniciar la etiqueta "Top" en el juego
-    const topLabel = document.getElementById("topScoreLabel");
-    topLabel.textContent = "Top: 0";
-
-    // Iniciar el juego
+  // Función para reiniciar el score más alto, la etiqueta "Top" y el juego
+  function resetGameAndScore() {
+    // Reiniciar el juego
     resetGame();
+  
+    // Reiniciar el registro del puntaje más alto
+    localStorage.removeItem('highScore');
+    console.log('Puntaje más alto reiniciado');
+  }
+  
+
+  // Cerrar la ventana de inicio del juego al hacer clic en el botón "Reiniciar score"
+  resetScoreButton.addEventListener('click', function() {
+    closeStartDialog();
+    resetGameAndScore();
+    resetHighScore(); // Llama a la función para reiniciar el puntaje más alto
+  });
+  
+
+  // Cerrar la ventana de Game Over al hacer clic en el botón "Reiniciar score"
+  document.getElementById('closeButton').addEventListener('click', () => {
+    document.getElementById('gameOverDialog').style.display = 'none';
+    resetGameAndScore(); // Reiniciar el juego y el score más alto al cerrar la ventana de Game Over
   });
 });
+
 
   let animationFrameId;
   function resetGame() {
@@ -522,6 +534,14 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById('replayButton').addEventListener('click', () => {
     location.reload(); // Recargar la página
   });
+  function resetHighScore() {
+    // Reiniciar el registro del puntaje más alto
+    localStorage.removeItem('highScore');
+    highScore = 0;
+    // Actualizar la etiqueta Top en el juego
+    const topLabel = document.getElementById('topScoreLabel');
+    topLabel.textContent = `Top: ${highScore}`;
+  }
   
   function loop() {
     if (!gameOver) {
