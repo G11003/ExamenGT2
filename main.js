@@ -2,7 +2,7 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
 // Tamaño del canvas con margen
-const canvasWidth = 550;
+const canvasWidth = 650;
 const canvasHeight = 600;
 
 const margin = 70;
@@ -52,6 +52,29 @@ for (const color in colorMap) {
   images[color] = loadImage(colorMap[color]);
 }
 
+// Función para mezclar aleatoriamente un arreglo
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Copia el nivel original y mezcla aleatoriamente las filas
+const randomizedLevel = level1.map(row => shuffleArray([...row]));
+
+const totalWidth = randomizedLevel[0].length * (grid + bubbleGap);
+const startX = (realCanvasWidth - totalWidth) / 2 + margin;
+
+// Crear burbujas aleatorias usando el nivel mezclado
+for (let row = 0; row < randomizedLevel.length; row++) {
+  for (let col = 0; col < randomizedLevel[row].length; col++) {
+    const color = randomizedLevel[row][col];
+    createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+  }
+}
+
 // Cargar la imagen del puntero personalizado
 const customPointer = loadImage('punto.png');
 
@@ -99,16 +122,6 @@ const textTopY = 15;
 context.font = '20px Century Gothic';
 context.fillText(textTop, textTopX, textTopY);
 
-}
-
-const totalWidth = level1[0].length * (grid + bubbleGap);
-const startX = (realCanvasWidth - totalWidth) / 2 + margin; 
-
-for (let row = 0; row < level1.length; row++) {
-  for (let col = 0; col < level1[row].length; col++) {
-    const color = level1[row][col];
-    createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
-  }
 }
 
 const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
@@ -335,7 +348,6 @@ function checkGameOver() {
 }
 
 let animationFrameId;
-
 function resetGame() {
   // Restablecer variables de juego
   bubbles.length = 0;
