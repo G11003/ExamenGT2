@@ -473,15 +473,21 @@ document.addEventListener("DOMContentLoaded", function() {
     closeStartDialog();
   });
 
-  // Función para reiniciar el score más alto
+  // Función para reiniciar el score más alto y el juego
   resetScoreButton.addEventListener("click", function() {
-    // Aquí deberías agregar el código para reiniciar el score más alto, posiblemente utilizando localStorage
-    // Por ejemplo:
+    // Reiniciar el registro del score más alto
     localStorage.removeItem("highScore");
     console.log("Score más alto reiniciado");
+
+    // Reiniciar la etiqueta "Top" en el juego
+    const topLabel = document.getElementById("topScoreLabel");
+    topLabel.textContent = "Top: 0";
+
+    // Iniciar el juego
+    resetGame();
   });
 });
-  
+
   let animationFrameId;
   function resetGame() {
     // Restablecer variables de juego
