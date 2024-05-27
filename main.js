@@ -215,6 +215,7 @@ function drawBubbles() {
     drawPlayer();
     drawArrow();
     drawCollisionFrame();
+    
     // Dibujar la burbuja disparada
     if (isShooting && shotBubble) {
       const img = images[shotBubble.color];
