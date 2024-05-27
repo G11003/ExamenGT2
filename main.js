@@ -127,7 +127,11 @@ function createBubble(x, y, color) {
     active: color ? true : false,
   });
 }
-
+function drawCollisionFrame() {
+  context.strokeStyle = 'white'; // Establecer el color del trazo como blanco
+  context.lineWidth = 1; // Establecer el ancho del trazo
+  context.strokeRect(margin + 6, 0, canvasWidth - 2.4 * margin, canvasHeight); // Dibujar un rectángulo con margen blanco
+}
 function drawBubbles() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -144,7 +148,8 @@ function drawBubbles() {
   context.fillText(`Top: ${highScore}`, margin, 40); 
   // Dibujar el nivel en el lado derecho
   context.textAlign = 'right'; // Alinear el texto a la derecha
-  context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin, 20);
+  context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin + 40, 20);
+
 }
  
   const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
@@ -209,7 +214,7 @@ function drawBubbles() {
     drawBubbles();
     drawPlayer();
     drawArrow();
-  
+    drawCollisionFrame();
     // Dibujar la burbuja disparada
     if (isShooting && shotBubble) {
       const img = images[shotBubble.color];
