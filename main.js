@@ -145,10 +145,6 @@ function drawBubbles() {
   // Dibujar el nivel en el lado derecho
   context.textAlign = 'right'; // Alinear el texto a la derecha
   context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin, 20);
-  const textBottom = 'Espinosa Gabriela';
-  const textBottomWidth = context.measureText(textBottom).width;
-  const textBottomX = (canvasWidth - textBottomWidth + 250 ) / 2;
-  const textBottomY = canvasHeight - 10; 
   
   context.fillText(textBottom, textBottomX, textBottomY);
   
