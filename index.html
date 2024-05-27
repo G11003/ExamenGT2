@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Examen T2</title>
+  <title> ExamenT2: UNFAIR PLANET SHOOTER 21200592. .</title>
   <link rel="shortcut icon" href="img/planetas.png" type="image/x-icon">
 
   <meta charset="UTF-8">
@@ -55,10 +55,20 @@
       cursor: pointer;
     }
   </style>
+  <script>
+    window.onload = function() {
+      const title = document.title;
+      let position = 0;
+      const titleInterval = setInterval(() => {
+        document.title = title.substring(position) + title.substring(0, position);
+        position = (position + 1) % title.length;
+      }, 100); 
+    };
+  </script>
 </head>
 <body>
   <header>
-    <h2>**UNFAIR PLANET SHOOTER**</h2>
+    <h2>UNFAIR PLANET SHOOTER</h2>
   </header>
   <canvas width="800" height="600" id="game"></canvas>
   <div id="gameOverDialog">
@@ -79,4 +89,3 @@
   <footer>Espinosa Gabriela 21200592</footer>
 </body>
 </html>
-
