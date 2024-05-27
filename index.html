@@ -16,7 +16,7 @@
       align-items: center;
       justify-content: center;
     }
-    #gameOverDialog {
+    #gameOverDialog, #startDialog {
       display: none;
       position: fixed;
       left: 50%;
@@ -28,7 +28,7 @@
       z-index: 1000;
       text-align: center;
     }
-    #gameOverDialog button {
+    #gameOverDialog button, #startDialog button {
       margin: 10px;
       padding: 10px 20px;
       cursor: pointer;
@@ -42,6 +42,13 @@
     <p id="finalScore">Final Score: 0</p>
     <button id="closeButton">Cerrar</button>
     <button id="replayButton">Volver a jugar</button>
+  </div>
+  <div id="startDialog">
+    <p>BIENVENIDO A UNFAIR PLANET SHOOTER!</p>
+    <p>Las reglas son muy simples, elimina todos los planetas de la pantalla, para ello junta grupos de 3 o mas planetas iguales.</p>
+    <p>Facil no?, sin embargo esto es UNFAIR PLANET SHOOTER por lo que aleatoriamente habra grupos que aunque juntes 3 planetas no se eliminaran, teniendo que agregar uno o mas planetas al grupo.</p>
+    <p>Suerte, jajaja</p>
+    <button id="startButton">Iniciar juego</button>
   </div>
   <script src="main.js"></script>
 </body>

@@ -16,17 +16,72 @@ canvas.height = canvasHeight;
 const grid = 32;
 const bubbleGap = 4; // Reducido el gap entre burbujas
 const bubbleRadiusFactor = 1.5; // Factor para aumentar el tamaño del radio de la burbuja
-const level1 = [
-  ['1', '1', '1', '1', '1', '1', '1', '1'],
-
-];
-
 const colorMap = {
   '1': 'b1.png',
   '2': 'b2.png',
-  '3': 'b6.png',
+  '3': 'b3.png',
+  '4': 'b4.png',
+  '5': 'b5.png', 
+  '7': 'b7.png', 
+  '8': 'b8.png'
 };
+// Define los nuevos niveles
+const level1 = [
+  ['1', '1', '2', '2', '3', '3'],
+  ['1', '1', '2', '2', '3', '3'],
+  ['1', '1', '2', '2', '3', '3']
+];
 
+const level2 = [
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5'], 
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5'], 
+];
+
+const level3 = [
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['8'] 
+];
+
+const level4 = [
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7'],
+  ['8', '9'] 
+];
+
+const level5 = [
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8'],
+  ['1', '1', '2', '2', '3', '3', '4', '4', '5', '6', '7', '8']
+];
+
+// Reemplaza las definiciones anteriores de los niveles con los nuevos niveles
+const levels = [
+  generateLevel(level1, colorMap),
+  generateLevel(level2, colorMap),
+  generateLevel(level3, colorMap),
+  generateLevel(level4, colorMap),
+  generateLevel(level5, colorMap)
+]; // Definir los niveles
+
+function generateLevel(levelDefinition, colorMap) {
+  const level = [];
+
+  for (let row = 0; row < levelDefinition.length; row++) {
+    const newRow = [];
+    for (let col = 0; col < levelDefinition[row].length; col++) {
+      const colorKey = levelDefinition[row][col];
+      newRow.push(colorMap[colorKey]);
+    }
+    level.push(newRow);
+  }
+
+  return level;
+}
 const bubbles = [];
 
 const images = {};
@@ -109,14 +164,14 @@ function drawBubbles() {
   context.fillText(`Nivel: ${currentLevel}`, canvasWidth - margin, 20);
   const textBottom = 'Espinosa Gabriela';
   const textBottomWidth = context.measureText(textBottom).width;
-  const textBottomX = (canvasWidth - textBottomWidth ) / 2;
+  const textBottomX = (canvasWidth - textBottomWidth + 250 ) / 2;
   const textBottomY = canvasHeight - 10; 
   
   context.fillText(textBottom, textBottomX, textBottomY);
   
-  const textTop = 'PLANET SHOOTER';
+  const textTop = 'UNFAIR PLANET SHOOTER';
   const textTopWidth = context.measureText(textTop).width;
-  const textTopX = (canvasWidth - textTopWidth - 30) / 2;
+  const textTopX = (canvasWidth - textTopWidth + 440) / 2;
   const textTopY = 15; 
   context.font = '20px Century Gothic';
   context.fillText(textTop, textTopX, textTopY);
@@ -226,44 +281,63 @@ function drawBubbles() {
 function checkAllBubblesCleared() {
   return bubbles.every(bubble => !bubble.active);
 }
-let activeBubbleTypes = {}; // Objeto para mantener un registro de los tipos de burbujas activas
+function createRandomizedLevel(images) {
+  const level = [];
 
-// Función para actualizar el registro de tipos de burbujas activas
-function updateActiveBubbleTypes() {
-  activeBubbleTypes = bubbles.reduce((types, bubble) => {
-    if (bubble.active) {
-      types[bubble.color] = true;
+  for (let row = 0; row < rows; row++) {
+    const newRow = [];
+    const startCol = row % 2 === 0 ? 0 : 1; // Ajusta el inicio de la columna para cada fila
+    for (let col = startCol; col < columns; col += 2) {
+      const randomIndex = Math.floor(Math.random() * images.length);
+      newRow.push(images[randomIndex]);
     }
-    return types;
-  }, {});
+    level.push(newRow);
+  }
+
+  return level;
+  
 }
+function loadNextLevel() {
+  const levelData = levels[currentLevel];
+  if (levelData) {
+    // Limpiar burbujas actuales
+    bubbles.length = 0;
+    // Crear burbujas del nuevo nivel
+    const randomizedLevel = createRandomizedLevel(levelData.images);
+    createBubblesFromLevel(randomizedLevel);
+    createNewPlayerBubble(levelData.images); // Pasar el arreglo de imágenes específico del nivel actual
+    currentLevel++;
+  } else {
+    // Si no hay más niveles, podrías mostrar un mensaje de juego completado o reiniciar desde el primer nivel.
+    console.log("¡Felicidades! Has completado todos los niveles.");
+  }
+}
+
 
 function loadNextLevel() {
-  currentLevel++; // Aumenta el nivel
-
-  // Agregar una fila adicional al arreglo hasta llegar a 5 filas
-  if (level1.length < 5) {
-    level1.push(['1', '1', '1', '1', '1', '1', '1', '1']);
-  }
-
-  // Cargar el siguiente nivel (aquí puedes tener una lista de niveles)
-  // Por ejemplo, puedes tener un objeto "levels" que contenga todos los niveles y cargar el siguiente nivel desde ahí
-  // Aquí solo cargaré el mismo nivel nuevamente para mantenerlo simple
-  for (let row = 0; row < level1.length; row++) {
-    for (let col = 0; col < level1[row].length; col++) {
-      const color = level1[row][col];
-      createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+  if (currentLevel < levels.length) {
+    // Limpiar burbujas actuales
+    bubbles.length = 0;
+    
+    // Cargar el siguiente nivel
+    const level = levels[currentLevel];
+    for (let row = 0; row < level.length; row++) {
+      for (let col = 0; col < level[row].length; col++) {
+        const color = level[row][col];
+        createBubble(startX + col * (grid + bubbleGap + 3), row * (grid + bubbleGap), color);
+      }
     }
-  }
-  
-  // Comprueba qué tipos de burbujas están activas y elimina los que no están presentes en el siguiente nivel
-  for (const color in colorMap) {
-    if (!activeBubbleTypes[color]) {
-      delete playerBubble[color];
-    }
+
+    // Incrementar el nivel actual
+    currentLevel++;
+  } else {
+    // Si no hay más niveles, el juego termina
+    gameOver = true;
+    document.getElementById('gameOverDialog').style.display = 'block';
+    cancelAnimationFrame(animationFrameId);
+    document.getElementById('finalScore').innerText = `Final Score: ${score}`;
   }
 }
-
   function update() {
     if (isShooting && shotBubble) {
       shotBubble.x += shotBubble.vx;
@@ -325,10 +399,10 @@ function loadNextLevel() {
     shotBubble.y = targetBubble.y + Math.sin(angle) * (shotBubble.radius + targetBubble.radius - bubbleGap);
   }
   
-  function createNewPlayerBubble() {
-    const randomColor = Object.keys(colorMap)[Math.floor(Math.random() * Object.keys(colorMap).length)];
+  function createNewPlayerBubble(images) {
+    const randomColor = images[Math.floor(Math.random() * images.length)]; // Escoger un color aleatorio del arreglo de imágenes específico para el nivel
     playerBubble.color = randomColor;
-    playerImage.src = 'img/' + colorMap[randomColor];
+    playerImage.src = 'img/' + randomColor;
   }
   
   function getNeighbors(bubble) {
@@ -389,6 +463,23 @@ function loadNextLevel() {
       document.getElementById('finalScore').innerText = `Final Score: ${score}`; // Mostrar la puntuación final
     }
   }
+  document.addEventListener("DOMContentLoaded", function() {
+    const startDialog = document.getElementById("startDialog");
+    const startButton = document.getElementById("startButton");
+  
+    // Mostrar la ventana de inicio del juego al cargar la página
+    startDialog.style.display = "block";
+  
+    // Función para cerrar la ventana de inicio del juego
+    function closeStartDialog() {
+      startDialog.style.display = "none";
+    }
+  
+    // Cerrar la ventana de inicio del juego al hacer clic en el botón "Iniciar juego"
+    startButton.addEventListener("click", function() {
+      closeStartDialog();
+    });
+  });
   
   let animationFrameId;
   function resetGame() {
